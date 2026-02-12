@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wolf AI - Code Debugger</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <!-- Offline Overlay -->
+    <div id="offlineOverlay" class="offline-overlay" style="display: none;">
+        <div class="offline-card">
+            <div class="offline-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 1l22 22M9 9l-6-6m0 6l6-6m7 3a5 5 0 0 1 7 7m-1-1l-6 6m6 0l-6-6"/>
+                </svg>
+            </div>
+            <h2>No Internet Connection</h2>
+            <p>Please check your network and try again</p>
+            
+            <div id="offlineSpinner" class="spinner" style="display: none;">
+                <div class="spinner-circle"></div>
+            </div>
+            
+            <div class="offline-buttons" id="offlineBtnGroup">
+                <button id="retryBtn" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                    <span>Retry Connection</span>
+                </button>
+                <button id="quitBtn" class="btn btn-outline-danger">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    <span>Quit Application</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        
+        <!-- Title Bar -->
+        <header class="title-bar">
+            <div class="title-bar-left">
+                <div class="wolf-icon-title">🐺</div>
+                <div class="app-title">
+                    <h1>Wolf AI</h1>
+                    <span class="app-subtitle">Code Debugger</span>
+                </div>
+            </div>
+            
+            <div class="title-bar-right">
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-label">Brain Active</span>
+                </div>
+                <button class="btn-execute" id="executeBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <span>Execute</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-layout">
+            
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                
+                <!-- New Chat Section -->
+                <div class="sidebar-section new-chat-section">
+                    <button class="btn-new-chat" id="newChatBtn" title="Start New Session">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>New Chat</span>
+                    </button>
+                </div>
+                
+                <!-- File Upload Section -->
+                <div class="sidebar-section">
+                    <h3 class="section-label">Source Files</h3>
+                    
+                    <div class="file-buttons-row">
+                        <button class="btn btn-file-action" id="selectFilesBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                                <polyline points="13 2 13 9 20 9"/>
+                            </svg>
+                            <span>Select Files</span>
+                        </button>
+                        
+                        <button class="btn btn-file-action" id="selectFolderBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>Select Folder</span>
+                        </button>
+                    </div>
+                    
+                    <div class="file-dropzone" id="dropZone">
+                        <svg class="dropzone-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                        </svg>
+                        <p class="dropzone-text">Drop files here</p>
+                    </div>
+                    
+                    <div class="files-list" id="selectedFiles">
+                        <div class="empty-state">
+                            <span>No files selected</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Configuration Section -->
+                <div class="sidebar-section">
+                    <h3 class="section-label">Configuration</h3>
+                    
+                    <div class="form-group">
+                        <label for="languageSelect">Language</label>
+                        <select id="languageSelect" class="form-select">
+                            <option value="auto">Auto Detect</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="cpp">C++ / C</option>
+                            <option value="java">Java</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                        </select>
+                    </div>
+                    
+                    <div class="progress-wrapper" id="progressContainer" style="display: none;">
+                        <div class="progress-info">
+                            <span id="progressText">Processing...</span>
+                            <span id="progressPercent">0%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+                
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="content-area">
+                
+                <!-- Results Header -->
+                <div class="content-header">
+                    <h2 class="content-title">Analysis Results</h2>
+                    <button class="btn btn-ghost" id="exportBtn" style="display: none;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                        </svg>
+                        <span>Export Report</span>
+                    </button>
+                </div>
+
+                <!-- Welcome Screen with Animated Wolf -->
+                <div class="welcome-container" id="welcomeScreen">
+                    <!-- Animated Wolf Face -->
+                    <div class="animated-wolf-container">
+                        <div class="animated-wolf" id="animatedWolf">
+                            <!-- Ears -->
+                            <div class="wolf-ear-animated wolf-ear-left-animated"></div>
+                            <div class="wolf-ear-animated wolf-ear-right-animated"></div>
+                            
+                            <!-- Head -->
+                            <div class="wolf-head-animated">
+                                <!-- Eyes -->
+                                <div class="wolf-eyes-animated">
+                                    <div class="wolf-eye-animated wolf-eye-left-animated">
+                                        <div class="wolf-pupil-animated" id="pupilLeft"></div>
+                                        <div class="wolf-eyelid-animated eyelid-left" id="eyelidLeft"></div>
+                                    </div>
+                                    <div class="wolf-eye-animated wolf-eye-right-animated">
+                                        <div class="wolf-pupil-animated" id="pupilRight"></div>
+                                        <div class="wolf-eyelid-animated eyelid-right" id="eyelidRight"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Snout & Mouth -->
+                                <div class="wolf-snout-animated">
+                                    <div class="wolf-nose-animated"></div>
+                                    <div class="wolf-mouth-animated" id="wolfMouth">
+                                        <div class="mouth-line"></div>
+                                        <!-- Smile elements -->
+                                        <svg class="smile-svg" viewBox="0 0 100 50">
+                                            <path id="smilePath" d="M 20 20 Q 50 30 80 20" stroke="#2a2a3a" stroke-width="3" fill="none"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Expression indicators -->
+                                <div class="wolf-expression" id="wolfExpression">
+                                    <!-- Z's for sleeping -->
+                                    <div class="sleep-z z1">Z</div>
+                                    <div class="sleep-z z2">Z</div>
+                                    <div class="sleep-z z3">Z</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="welcome-title">Ready to Debug</h2>
+                    <p class="welcome-message">Select code files to begin analysis</p>
+                </div>
+
+                <!-- Analysis Results -->
+                <div class="results-container" id="analysisResults" style="display: none;">
+                    <!-- Results will be dynamically inserted here -->
+                </div>
+
+                <!-- Activity Log -->
+                <div class="activity-log" id="activityLog">
+                    <div class="log-header">
+                        <h3 class="log-title">Activity Log</h3>
+                        <div class="log-actions">
+                            <button class="btn-clear" id="clearLogBtn">Clear</button>
+                            <button class="btn-toggle-log" id="toggleLogBtn" title="Toggle Log">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="log-content" id="logContent">
+                        <p class="log-entry log-info">Wolf AI initialized successfully</p>
+                        <p class="log-entry log-info">Waiting for input files...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
