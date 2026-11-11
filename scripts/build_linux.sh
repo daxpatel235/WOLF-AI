@@ -22,6 +22,29 @@ python -m PyInstaller --noconfirm --clean --windowed \
   main.py
 [ -x dist/WolfAI/WolfAI ] || { echo "dist/WolfAI/WolfAI was not created"; exit 1; }
 
+# PyInstaller also copies some of the *build machine's* system libraries (e.g. Mesa's libgbm) into
+# the bundle. Those are tied to that machine's graphics stack and pull in libraries the bundle
+# doesn't carry (libgbm -> libwayland-server), so they break on other distros. Remove every bundled
+# copy of a library the packages declare as a system dependency (qt-sonames.txt), plus Wayland and
+# Mesa internals, so the app always uses the user's own, matching system libraries.
+INTERNAL=dist/WolfAI/_internal
+mapfile -t SYSTEM_LIBS < <(sed -e 's/#.*//' -e '/^[[:space:]]*$/d' packaging/linux/qt-sonames.txt | xargs -n1)
+pruned=0
+while IFS= read -r -d '' f; do
+  name="$(basename "$f")"
+  remove=0
+  for lib in "${SYSTEM_LIBS[@]}"; do
+    [ "$name" = "$lib" ] && remove=1 && break
+  done
+  case "$name" in libwayland-*.so*|libglapi.so*|libgbm.so*|libdrm.so*|libEGL*.so*|libGL*.so*) remove=1 ;; esac
+  if [ "$remove" = 1 ]; then
+    echo "  using system copy instead of bundled ${f#"$INTERNAL"/}"
+    rm -f "$f"
+    pruned=$((pruned + 1))
+  fi
+done < <(find "$INTERNAL" -path "$INTERNAL/PyQt6/Qt6" -prune -o \( -type f -o -type l \) -name 'lib*.so*' -print0)
+echo "Removed $pruned bundled system libraries"
+
 # ---------- .deb and .rpm: /opt/wolf-ai + /usr/bin/wolf-ai + menu entry ----------
 ROOT=build/pkgroot
 mkdir -p "$ROOT/opt" "$ROOT/usr/bin" "$ROOT/usr/share/applications" "$ROOT/usr/share/icons/hicolor/256x256/apps"
