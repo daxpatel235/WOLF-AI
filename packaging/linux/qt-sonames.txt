@@ -1,0 +1,67 @@
+# System libraries the bundled Qt 6 / Qt WebEngine binaries link against (DT_NEEDED entries that
+# the PyQt6 wheels don't ship). The .rpm depends on these sonames directly, and every one must be
+# covered by deb-depends.txt (tests/test_packaging.py checks this).
+# glibc, libstdc++ and libgcc are part of every distro's base system and are listed for completeness.
+#
+# Regenerate when upgrading PyQt6: read DT_NEEDED of the Qt libraries, platform plugins and
+# QtWebEngineProcess, and keep the ones not shipped inside the wheels.
+libc.so.6
+libm.so.6
+libdl.so.2
+libpthread.so.0
+librt.so.1
+libresolv.so.2
+libstdc++.so.6
+libgcc_s.so.1
+libatomic.so.1
+libz.so.1
+libzstd.so.1
+libglib-2.0.so.0
+libgthread-2.0.so.0
+libdbus-1.so.3
+libexpat.so.1
+libfontconfig.so.1
+libfreetype.so.6
+libgssapi_krb5.so.2
+libnss3.so
+libnssutil3.so
+libsmime3.so
+libnspr4.so
+libplc4.so
+libplds4.so
+libasound.so.2
+libEGL.so.1
+libGL.so.1
+libgbm.so.1
+libdrm.so.2
+libxshmfence.so.1
+libX11.so.6
+libX11-xcb.so.1
+libXext.so.6
+libXfixes.so.3
+libXi.so.6
+libXrender.so.1
+libXrandr.so.2
+libXtst.so.6
+libXcomposite.so.1
+libXdamage.so.1
+libxkbfile.so.1
+libxcb.so.1
+libxcb-cursor.so.0
+libxcb-dri3.so.0
+libxcb-icccm.so.4
+libxcb-image.so.0
+libxcb-keysyms.so.1
+libxcb-randr.so.0
+libxcb-render.so.0
+libxcb-render-util.so.0
+libxcb-shape.so.0
+libxcb-shm.so.0
+libxcb-sync.so.1
+libxcb-util.so.1
+libxcb-xfixes.so.0
+libxcb-xkb.so.1
+libxkbcommon.so.0
+libxkbcommon-x11.so.0
+libwayland-client.so.0
+libwayland-cursor.so.0

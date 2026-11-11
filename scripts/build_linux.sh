@@ -40,17 +40,19 @@ FPM_COMMON=(
 )
 
 # Runtime libraries for the bundled Qt WebEngine (Qt itself is inside /opt/wolf-ai).
-DEB_DEPS=(libegl1 libgl1 libgbm1 libdrm2 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 libxcb-icccm4
-  libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0
-  libxcb-xkb1 libxshmfence1 libnss3 libxcomposite1 libxdamage1 libxrandr2 libxtst6 libxkbfile1
-  libfontconfig1 libfreetype6 libdbus-1-3 libgssapi-krb5-2 "libglib2.0-0 | libglib2.0-0t64"
-  "libasound2 | libasound2t64")
-RPM_DEPS=(mesa-libEGL mesa-libGL mesa-libgbm libdrm libxkbcommon libxkbcommon-x11 xcb-util-cursor
-  xcb-util-wm xcb-util-image xcb-util-keysyms xcb-util-renderutil libxshmfence nss libXcomposite
-  libXdamage libXrandr libXtst libxkbfile fontconfig freetype dbus-libs krb5-libs glib2 alsa-lib)
-
-deb_args=(); for d in "${DEB_DEPS[@]}"; do deb_args+=(-d "$d"); done
-rpm_args=(); for d in "${RPM_DEPS[@]}"; do rpm_args+=(-d "$d"); done
+# .deb: package names from deb-depends.txt. .rpm: the sonames themselves, e.g. libEGL.so.1()(64bit),
+# which Fedora, RHEL and openSUSE all resolve regardless of how they name their packages.
+deb_args=()
+while IFS= read -r line; do
+  dep="${line%%#*}"; dep="$(echo "$dep" | xargs)"
+  [ -n "$dep" ] && deb_args+=(-d "$dep")
+done < packaging/linux/deb-depends.txt
+rpm_args=()
+while IFS= read -r line; do
+  soname="$(echo "${line%%#*}" | xargs)"
+  [ -n "$soname" ] && rpm_args+=(-d "${soname}()(64bit)")
+done < packaging/linux/qt-sonames.txt
+echo "deb dependencies: $(( ${#deb_args[@]} / 2 )), rpm dependencies: $(( ${#rpm_args[@]} / 2 ))"
 
 fpm "${FPM_COMMON[@]}" -t deb -a amd64 "${deb_args[@]}" -p "dist/WolfAI-${VERSION}-amd64.deb" .
 fpm "${FPM_COMMON[@]}" -t rpm -a x86_64 "${rpm_args[@]}" --rpm-os linux -p "dist/WolfAI-${VERSION}-x86_64.rpm" .

@@ -128,6 +128,30 @@ def test_icons_are_valid():
     assert (ICONS / "wolfai-256.png").exists()
 
 
+def _data_lines(path):
+    lines = []
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        if raw.strip() and not raw.lstrip().startswith("#"):
+            lines.append(raw)
+    return lines
+
+
+def test_every_qt_system_library_has_a_deb_dependency():
+    linux = ROOT / "packaging" / "linux"
+    sonames = {line.strip() for line in _data_lines(linux / "qt-sonames.txt")}
+    covered = set()
+    for line in _data_lines(linux / "deb-depends.txt"):
+        assert "#" in line, f"deb-depends.txt line has no soname comment: {line}"
+        dep, comment = line.split("#", 1)
+        assert dep.strip(), f"empty dependency: {line}"
+        covered |= set(comment.split())
+    assert sonames, "qt-sonames.txt is empty"
+    assert not sonames - covered, f"no .deb dependency provides: {sorted(sonames - covered)}"
+    assert not covered - sonames, f"deb-depends.txt lists unknown sonames: {sorted(covered - sonames)}"
+    for must in ("libEGL.so.1", "libxcb-cursor.so.0", "libnss3.so", "libatomic.so.1"):
+        assert must in sonames
+
+
 def test_desktop_entry():
     entry = (ROOT / "packaging" / "linux" / "wolf-ai.desktop").read_text(encoding="utf-8")
     for line in ("Type=Application", "Exec=wolf-ai", "Icon=wolf-ai", "Terminal=false"):

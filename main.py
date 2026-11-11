@@ -23,8 +23,27 @@ GUI_BY_PLATFORM = {"win32": "edgechromium", "darwin": "cocoa", "linux": "qt"}
 SELF_TEST_MODULES = {
     "win32": ["webview.platforms.winforms", "webview.platforms.edgechromium"],
     "darwin": ["webview.platforms.cocoa"],
-    "linux": ["webview.platforms.qt"],
+    # Import Qt WebEngine directly first: pywebview hides its import error behind a PyQt5 fallback.
+    "linux": ["PyQt6.QtWebEngineWidgets", "webview.platforms.qt"],
 }
+
+
+def configure_linux_webengine():
+    """
+    Ubuntu 24.04+ blocks unprivileged user namespaces with AppArmor, which Qt WebEngine's
+    (Chromium's) sandbox needs; the web view then crashes and the window stays blank.
+    In that case only, run without the Chromium sandbox. The app only shows its own local UI.
+    """
+    if not sys.platform.startswith("linux") or "QTWEBENGINE_DISABLE_SANDBOX" in os.environ:
+        return
+    try:
+        with open("/proc/sys/kernel/apparmor_restrict_unprivileged_userns", encoding="ascii") as f:
+            restricted = f.read().strip() == "1"
+    except OSError:
+        restricted = False
+    if restricted:
+        os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
+        log.info("AppArmor restricts user namespaces; Qt WebEngine sandbox disabled")
 
 
 def setup_logging():
@@ -155,6 +174,7 @@ def main():
 
     setup_logging()
     log.info("Starting %s %s", APP_NAME, __version__)
+    configure_linux_webengine()
     try:
         WolfAIApp().run()
     except Exception as e:

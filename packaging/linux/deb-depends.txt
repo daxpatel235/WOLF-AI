@@ -1,0 +1,53 @@
+# Debian/Ubuntu package dependencies for the .deb, one per line: "<depends>  # <sonames it provides>".
+# "a | b" alternatives cover Ubuntu 24.04's 64-bit time_t renames (…t64 packages).
+# Every soname in qt-sonames.txt must appear in a comment here (tests/test_packaging.py).
+libc6  # libc.so.6 libm.so.6 libdl.so.2 libpthread.so.0 librt.so.1 libresolv.so.2
+libstdc++6  # libstdc++.so.6
+libgcc-s1  # libgcc_s.so.1
+libatomic1  # libatomic.so.1
+zlib1g  # libz.so.1
+libzstd1  # libzstd.so.1
+libglib2.0-0 | libglib2.0-0t64  # libglib-2.0.so.0 libgthread-2.0.so.0
+libdbus-1-3  # libdbus-1.so.3
+libexpat1  # libexpat.so.1
+libfontconfig1  # libfontconfig.so.1
+libfreetype6  # libfreetype.so.6
+libgssapi-krb5-2  # libgssapi_krb5.so.2
+libnss3  # libnss3.so libnssutil3.so libsmime3.so
+libnspr4  # libnspr4.so libplc4.so libplds4.so
+libasound2 | libasound2t64  # libasound.so.2
+libegl1  # libEGL.so.1
+libgl1  # libGL.so.1
+libgbm1  # libgbm.so.1
+libdrm2  # libdrm.so.2
+libxshmfence1  # libxshmfence.so.1
+libx11-6  # libX11.so.6
+libx11-xcb1  # libX11-xcb.so.1
+libxext6  # libXext.so.6
+libxfixes3  # libXfixes.so.3
+libxi6  # libXi.so.6
+libxrender1  # libXrender.so.1
+libxrandr2  # libXrandr.so.2
+libxtst6  # libXtst.so.6
+libxcomposite1  # libXcomposite.so.1
+libxdamage1  # libXdamage.so.1
+libxkbfile1  # libxkbfile.so.1
+libxcb1  # libxcb.so.1
+libxcb-cursor0  # libxcb-cursor.so.0
+libxcb-dri3-0  # libxcb-dri3.so.0
+libxcb-icccm4  # libxcb-icccm.so.4
+libxcb-image0  # libxcb-image.so.0
+libxcb-keysyms1  # libxcb-keysyms.so.1
+libxcb-randr0  # libxcb-randr.so.0
+libxcb-render0  # libxcb-render.so.0
+libxcb-render-util0  # libxcb-render-util.so.0
+libxcb-shape0  # libxcb-shape.so.0
+libxcb-shm0  # libxcb-shm.so.0
+libxcb-sync1  # libxcb-sync.so.1
+libxcb-util1  # libxcb-util.so.1
+libxcb-xfixes0  # libxcb-xfixes.so.0
+libxcb-xkb1  # libxcb-xkb.so.1
+libxkbcommon0  # libxkbcommon.so.0
+libxkbcommon-x11-0  # libxkbcommon-x11.so.0
+libwayland-client0  # libwayland-client.so.0
+libwayland-cursor0  # libwayland-cursor.so.0
