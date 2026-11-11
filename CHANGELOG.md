@@ -16,7 +16,8 @@ Wolf AI now asks before it changes your code, and you can undo any fix it writes
 - **Git aware.** Load only files with uncommitted changes, and commit applied fixes to a separate `wolf-ai/fixes-…` branch. Your own branch is left untouched.
 - **Unchanged files are skipped.** The last result is reused when a file's content hasn't changed.
 - **Drag & drop** files or folders anywhere on the window.
-- **Windows installer.** Each release includes an `.msi` installer, a portable `.exe`, and a `.zip`.
+- **Installers for every desktop.** Windows `x64-setup.exe` and `.msi`, macOS `.dmg` for Apple silicon and Intel, and Linux `.AppImage`, `.deb` and `.rpm`.
+- **New app icon** featuring the wolf mascot.
 
 ### Fixed
 - Files larger than 12,000 characters were cut short and the shortened "fix" was saved over the original, losing the rest of the file.
@@ -30,9 +31,10 @@ Wolf AI now asks before it changes your code, and you can undo any fix it writes
 - The API key is no longer stored in the repository or bundled into the `.exe`. It is saved in your user profile (`%APPDATA%\WolfAI`) and is never sent back to the UI. If you used a real key in `wolf_key.json` before, rotate it.
 
 ### Developer
-- GitHub Actions: lint, tests (backend, UI contract, and a headless-browser UI smoke test) on Ubuntu and Windows, plus a Windows build on every push.
-- Pushing a `v*.*.*` tag builds and publishes a GitHub release.
-- `scripts/build.ps1` builds everything locally.
+- GitHub Actions: lint and tests (backend, UI contract, packaging, and a headless-browser UI smoke test) on Windows, macOS and Linux.
+- Every push builds all installers. Each one is installed or mounted on a CI runner, the app's `--self-test` runs there, and Windows and Linux packages are uninstalled again. The `.rpm` is tested on Fedora.
+- Pushing a `v*.*.*` tag builds and checks everything, then publishes a GitHub release with SHA-256 checksums.
+- Build scripts per platform: `scripts/build.ps1`, `scripts/build_macos.sh`, `scripts/build_linux.sh`.
 
 ## [1.0.0]
 

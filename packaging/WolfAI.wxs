@@ -2,7 +2,7 @@
 <!--
   Wolf AI installer (WiX v5).
   Built by scripts\build.ps1:
-    wix build packaging\WolfAI.wxs -arch x64 -d Version=2.0.0 -bindpath app=dist\WolfAI -o dist\WolfAI-2.0.0-x64.msi
+    wix build packaging\WolfAI.wxs -arch x64 -d Version=2.0.0 -bindpath app=dist\WolfAI -bindpath icons=packaging\icons -o dist\WolfAI-2.0.0-x64.msi
 
   Keep UpgradeCode the same in every release: it lets a new version replace the old one.
 -->
@@ -18,6 +18,8 @@
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
+    <Icon Id="WolfAIIcon" SourceFile="!(bindpath.icons)\wolfai.ico" />
+    <Property Id="ARPPRODUCTICON" Value="WolfAIIcon" />
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/daxpatel235/WOLF-AI" />
     <Property Id="ARPHELPLINK" Value="https://github.com/daxpatel235/WOLF-AI/issues" />
 
@@ -36,7 +38,8 @@
                   Name="Wolf AI"
                   Description="AI-powered code debugger"
                   Target="[INSTALLFOLDER]WolfAI.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="WolfAIIcon" />
         <RegistryValue Root="HKCU" Key="Software\Dax Patel\Wolf AI"
                        Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
       </Component>
@@ -48,7 +51,8 @@
                   Name="Wolf AI"
                   Description="AI-powered code debugger"
                   Target="[INSTALLFOLDER]WolfAI.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="WolfAIIcon" />
         <RegistryValue Root="HKCU" Key="Software\Dax Patel\Wolf AI"
                        Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
       </Component>

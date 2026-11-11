@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Wolf AI
+GenericName=Code Debugger
+Comment=AI-powered code debugger
+Exec=wolf-ai
+Icon=wolf-ai
+Terminal=false
+Categories=Development;Debugger;
+Keywords=code;debug;ai;lint;
+StartupWMClass=WolfAI

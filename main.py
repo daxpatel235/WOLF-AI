@@ -1,7 +1,9 @@
+import importlib
 import json
 import logging
 import os
 import sys
+import tempfile
 import traceback
 from logging.handlers import RotatingFileHandler
 
@@ -12,6 +14,17 @@ from backend.config import app_data_dir
 from backend.version import APP_NAME, __version__
 
 log = logging.getLogger("wolfai")
+
+# pywebview backend per platform. Windows needs WebView2 (Edge): without it pywebview could fall back
+# to an engine that can't run the modern UI and the window would stay blank.
+GUI_BY_PLATFORM = {"win32": "edgechromium", "darwin": "cocoa", "linux": "qt"}
+
+# Modules a packaged build must contain to open its window, per platform.
+SELF_TEST_MODULES = {
+    "win32": ["webview.platforms.winforms", "webview.platforms.edgechromium"],
+    "darwin": ["webview.platforms.cocoa"],
+    "linux": ["webview.platforms.qt"],
+}
 
 
 def setup_logging():
@@ -93,13 +106,53 @@ class WolfAIApp:
         )
         self.api.set_window(self.window)
 
-        # On Windows, require WebView2 (Edge). Without it pywebview could fall back to an
-        # engine that can't run the modern UI and the window would stay blank.
-        gui = "edgechromium" if sys.platform == "win32" else None
-        webview.start(self.bind_events, self.window, gui=gui, debug=False)
+        webview.start(self.bind_events, self.window, gui=GUI_BY_PLATFORM.get(sys.platform), debug=False)
+
+
+def self_test(report_path=None, check_gui=True):
+    """
+    Checks a build without opening a window: the bundled UI files, the backend, and the
+    platform's web engine modules. Used by CI on every installer. Returns an exit code.
+    """
+    problems = []
+    for name in ("index.html", "script.js", "styles.css"):
+        if not os.path.exists(get_resource_path(os.path.join("Web", name))):
+            problems.append(f"missing bundled file Web/{name}")
+    if getattr(sys, "frozen", False) and os.path.exists(get_resource_path("wolf_key.json")):
+        problems.append("wolf_key.json must not be bundled")
+
+    # Use a throwaway profile so the test never touches real settings.
+    os.environ["APPDATA"] = tempfile.mkdtemp(prefix="wolfai-selftest-")
+    try:
+        bridge = ApiBridge()
+        if bridge.get_version() != __version__:
+            problems.append("bridge reports the wrong version")
+        importlib.import_module("groq")  # imported lazily by the app, so check it was bundled
+    except Exception as e:
+        problems.append(f"backend: {e!r}")
+
+    if check_gui:
+        for module in SELF_TEST_MODULES.get(sys.platform, []):
+            try:
+                importlib.import_module(module)
+            except Exception as e:
+                problems.append(f"{module}: {e!r}")
+
+    report = f"{APP_NAME} {__version__} self-test: " + (
+        "OK" if not problems else "FAILED\n" + "\n".join(f"- {p}" for p in problems))
+    if report_path:
+        with open(report_path, "w", encoding="utf-8") as f:
+            f.write(report + "\n")
+    if sys.stdout:  # None in the windowed Windows build
+        print(report)
+    return 0 if not problems else 1
 
 
 def main():
+    if "--self-test" in sys.argv:
+        args = sys.argv[sys.argv.index("--self-test") + 1:]
+        sys.exit(self_test(args[0] if args else None))
+
     setup_logging()
     log.info("Starting %s %s", APP_NAME, __version__)
     try:

@@ -1,0 +1,145 @@
+name: Build installers
+
+# Reusable: called by ci.yml (every push/PR) and release.yml (tags).
+# Builds every installer, then installs/opens and self-tests each one on the runner.
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: App version (defaults to backend/version.py)
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash # stops on the first failing command, also on Windows
+
+jobs:
+  windows:
+    name: Windows x64 (setup.exe, msi)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install WiX
+        run: dotnet tool install --global wix --version 5.0.2
+
+      - name: Build
+        shell: pwsh
+        run: ./scripts/build.ps1 -Version "${{ inputs.version }}"
+
+      - name: Check (self-test, install, uninstall)
+        shell: pwsh
+        run: ./scripts/check_windows.ps1 -Version "${{ inputs.version }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-windows-x64
+          path: |
+            dist/*-x64-setup.exe
+            dist/*-x64.msi
+          if-no-files-found: error
+
+  macos:
+    name: macOS ${{ matrix.label }} (dmg)
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14        # Apple silicon
+            label: aarch64
+          - runner: macos-15-intel  # Intel
+            label: x64
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Build
+        run: bash scripts/build_macos.sh ${{ inputs.version }}
+
+      - name: Check (mount, verify, self-test)
+        run: bash scripts/check_macos.sh ${{ inputs.version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-macos-${{ matrix.label }}
+          path: dist/*.dmg
+          if-no-files-found: error
+
+  linux:
+    name: Linux x64 (AppImage, deb, rpm)
+    # Oldest supported Ubuntu: binaries built here also run on newer distros.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install system packages (Qt runtime libs, packaging tools)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libegl1 libgl1 libgbm1 libdrm2 libxkbcommon0 libxkbcommon-x11-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
+            libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxshmfence1 libnss3 libxcomposite1 \
+            libxdamage1 libxrandr2 libxtst6 libxkbfile1 libfontconfig1 libfreetype6 libdbus-1-3 \
+            libgssapi-krb5-2 libglib2.0-0 libasound2 \
+            rpm ruby ruby-dev build-essential file desktop-file-utils
+          sudo gem install --no-document fpm
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-linux.txt -r requirements-dev.txt
+
+      - name: Build
+        run: bash scripts/build_linux.sh ${{ inputs.version }}
+
+      - name: Check (AppImage self-test, deb via apt, rpm via dnf in Fedora)
+        run: bash scripts/check_linux.sh ${{ inputs.version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-linux-x64
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+          if-no-files-found: error

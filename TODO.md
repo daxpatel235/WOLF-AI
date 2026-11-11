@@ -23,7 +23,9 @@
 - [x] Security and startup review (bridge internals hidden from JS, startup log + error dialog, working drag & drop)
 - [x] Tests: backend, UI contract, headless-browser UI smoke test
 - [x] GitHub Actions: CI (lint, tests, Windows build) and tag-triggered release
-- [x] Windows packaging: portable exe, zip, MSI installer (scripts/build.ps1, packaging/WolfAI.wxs)
+- [x] Installers: Windows x64-setup.exe + msi, macOS aarch64/x64 dmg, Linux AppImage/deb/rpm
+- [x] Installer checks in CI: install/mount, `--self-test`, uninstall on every platform
+- [x] App icon
 
 ## Later (not started)
 - [ ] Results dashboard (severity totals, top files, issue-type chart)

@@ -36,32 +36,18 @@ python main.py
 Start the app and open Settings (⚙ in the title bar), then paste your Groq API key.
 Do NOT put the key in the project folder or in the build: it is stored in your user profile.
 
-🚀 5️⃣ Convert to Executable (.exe) Using PyInstaller
-The UI files in Web/ must be bundled with the app (Windows uses ; and macOS/Linux use : in --add-data):
-Windows:
-pyinstaller --onefile --noconsole --add-data "Web;Web" --name WolfAI main.py
-macOS / Linux:
-pyinstaller --onefile --noconsole --add-data "Web:Web" --name WolfAI main.py
-Never add wolf_key.json to --add-data: anyone with the .exe could extract the key.
+🚀 5️⃣ Build installers
+Each platform is built on its own OS. See "Building installers" in README.md for the tools each one needs.
+Windows (x64-setup.exe + .msi):
+.\scripts\build.ps1
+macOS (.dmg for the Mac's architecture):
+bash scripts/build_macos.sh
+Linux (.AppImage, .deb, .rpm):
+pip install -r requirements-linux.txt
+bash scripts/build_linux.sh
 
-📁 6️⃣ Understanding Generated Folders
-After running PyInstaller, you will see:
-build/
-dist/
-WolfAI.spec
+Everything ends up in dist/. Check a build without opening a window:
+dist/WolfAI/WolfAI --self-test
 
-📂 dist/ Folder (Important)
-This is the final output folder.
-Inside it:
-dist/
- └── WolfAI.exe
-
- 👉 This .exe file is your standalone application.
-You can share this file with others — they do NOT need Python installed.
-
-
-
-
-
-
-
+Never bundle wolf_key.json: anyone with the installer could extract the key.
+GitHub Actions builds and checks all of these automatically on every push.
