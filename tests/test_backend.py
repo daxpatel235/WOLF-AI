@@ -211,6 +211,62 @@ def test_review_apply_revert_and_commit_flow(appdata):
     assert "x = 1" in open(path).read()
 
 
+def test_git_paths_through_a_symlink(appdata):
+    # macOS temp dirs live under /var -> /private/var; git reports the resolved root.
+    real = os.path.join(appdata, "real-repo")
+    os.makedirs(real)
+    _git(real, "init", "-b", "main")
+    _git(real, "config", "user.email", "test@example.com")
+    _git(real, "config", "user.name", "Test")
+    with open(os.path.join(real, "app.py"), "w") as f:
+        f.write("x = 1\n")
+    _git(real, "add", ".")
+    _git(real, "commit", "-m", "init")
+
+    link = os.path.join(appdata, "linked-repo")
+    try:
+        os.symlink(real, link, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("creating symlinks is not permitted here")
+
+    from backend import git_tools
+    path = os.path.join(link, "app.py")
+    root = git_tools.repo_root(path)
+    assert git_tools.rel_path(path, root) == "app.py"
+    assert git_tools.head_text(root, path) == "x = 1\n"
+
+    bridge = _make_bridge()
+    bridge.start_analysis(path, "auto")
+    assert bridge.apply_fix(path, None)["success"]
+    commit = bridge.commit_fixes()
+    assert commit["success"], commit
+
+
+@pytest.mark.skipif(os.name != "nt", reason="8.3 short paths are Windows-only")
+def test_git_paths_through_a_windows_short_path(appdata):
+    import ctypes
+    from backend import git_tools
+
+    real = os.path.join(appdata, "a very long repository folder name")
+    os.makedirs(real)
+    _git(real, "init", "-b", "main")
+    _git(real, "config", "user.email", "test@example.com")
+    _git(real, "config", "user.name", "Test")
+    with open(os.path.join(real, "app.py"), "w") as f:
+        f.write("x = 1\n")
+    _git(real, "add", ".")
+    _git(real, "commit", "-m", "init")
+
+    buf = ctypes.create_unicode_buffer(1024)
+    ctypes.windll.kernel32.GetShortPathNameW(real, buf, len(buf))
+    if "~" not in buf.value:
+        pytest.skip("8.3 short names are disabled on this volume")
+    path = os.path.join(buf.value, "app.py")
+    root = git_tools.repo_root(path)
+    assert git_tools.rel_path(path, root) == "app.py"
+    assert git_tools.head_text(root, path) == "x = 1\n"
+
+
 def test_apply_refused_if_file_changed_since_analysis(appdata):
     path = os.path.join(appdata, "a.py")
     with open(path, "w") as f:

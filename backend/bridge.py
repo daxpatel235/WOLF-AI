@@ -316,7 +316,7 @@ class ApiBridge:
         results = []
         for root, items in by_repo.items():
             paths = [p for _, p in items]
-            message = "Wolf AI fixes\n\n" + "\n".join(f"- {os.path.relpath(p, root)}" for p in paths)
+            message = "Wolf AI fixes\n\n" + "\n".join(f"- {git_tools.rel_path(p, root)}" for p in paths)
             try:
                 info = git_tools.commit_to_new_branch(root, paths, message)
             except (OSError, RuntimeError) as e:

@@ -69,9 +69,17 @@ def changed_files(root):
     return paths
 
 
+def rel_path(path, root):
+    """
+    Repo-relative path. Git reports the root with symlinks resolved (e.g. macOS /var is really
+    /private/var), so resolve both sides or the result points outside the repo.
+    """
+    return os.path.relpath(os.path.realpath(path), os.path.realpath(root))
+
+
 def head_text(root, path):
     """File content at HEAD, or None if it isn't tracked there."""
-    rel = os.path.relpath(path, root).replace(os.sep, "/")
+    rel = rel_path(path, root).replace(os.sep, "/")
     result = _git(root, "show", f"HEAD:{rel}", check=False)
     return result.stdout if result.returncode == 0 else None
 
@@ -84,7 +92,7 @@ def commit_to_new_branch(root, paths, message):
     original = current_branch(root)
     original_ref = original or _git(root, "rev-parse", "HEAD").stdout.strip()
     branch = time.strftime("wolf-ai/fixes-%Y%m%d-%H%M%S")
-    rels = [os.path.relpath(p, root) for p in paths]
+    rels = [rel_path(p, root) for p in paths]
 
     _git(root, "switch", "-c", branch)
     try:
