@@ -114,12 +114,10 @@ jobs:
 
       - name: Install system packages (Qt runtime libs, packaging tools)
         run: |
-          # Retry downloads: runner DNS/mirror hiccups otherwise fail the whole build.
-          echo 'Acquire::Retries "5";' | sudo tee /etc/apt/apt.conf.d/80-retries
-          sudo apt-get update
           # The app's runtime libraries: the same list the .deb depends on (first alternative = 22.04 name).
           runtime_libs="$(sed -e 's/#.*//' -e 's/|.*//' packaging/linux/deb-depends.txt | xargs)"
-          sudo apt-get install -y --no-install-recommends $runtime_libs \
+          # Retries and falls back to Ubuntu's own mirrors if the runner's Azure mirror is unreachable.
+          bash scripts/ci_apt_install.sh $runtime_libs \
             rpm ruby ruby-dev build-essential file desktop-file-utils
           sudo gem install --no-document fpm
 
