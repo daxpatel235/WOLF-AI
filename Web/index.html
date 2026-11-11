@@ -59,6 +59,12 @@
                     <span class="status-dot"></span>
                     <span class="status-label">Brain Active</span>
                 </div>
+                <button class="btn-icon" id="settingsBtn" title="Settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
                 <button class="btn-execute" id="executeBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M8 5v14l11-7z"/>
@@ -118,6 +124,16 @@
                             <span>No files selected</span>
                         </div>
                     </div>
+
+                    <div class="git-panel" id="gitPanel" style="display: none;">
+                        <div class="git-info">
+                            <span class="git-badge">git</span>
+                            <span id="gitRepoLabel"></span>
+                        </div>
+                        <button class="btn btn-file-action btn-block" id="gitChangedBtn" title="Replace the queue with files that have uncommitted changes">
+                            <span>Load changed files only</span>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Configuration Section -->
@@ -128,14 +144,33 @@
                         <label for="languageSelect">Language</label>
                         <select id="languageSelect" class="form-select">
                             <option value="auto">Auto Detect</option>
-                            <option value="python">Python</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="typescript">TypeScript</option>
-                            <option value="cpp">C++ / C</option>
-                            <option value="java">Java</option>
-                            <option value="go">Go</option>
-                            <option value="rust">Rust</option>
+                            <option value="Python">Python</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="TypeScript">TypeScript</option>
+                            <option value="C++">C++</option>
+                            <option value="C">C</option>
+                            <option value="Java">Java</option>
+                            <option value="Go">Go</option>
+                            <option value="Rust">Rust</option>
+                            <option value="PHP">PHP</option>
+                            <option value="Ruby">Ruby</option>
+                            <option value="Swift">Swift</option>
+                            <option value="Kotlin">Kotlin</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>What to check</label>
+                        <div class="check-toggles" id="checkToggles">
+                            <label class="chip"><input type="checkbox" data-check="bugs"><span>Bugs</span></label>
+                            <label class="chip"><input type="checkbox" data-check="security"><span>Security</span></label>
+                            <label class="chip"><input type="checkbox" data-check="performance"><span>Performance</span></label>
+                            <label class="chip"><input type="checkbox" data-check="style"><span>Style</span></label>
+                        </div>
+                    </div>
+
+                    <div class="mode-note" id="analyzeOnlyNote" style="display: none;">
+                        Analyze-only mode: fixes are shown, never written.
                     </div>
                     
                     <div class="progress-wrapper" id="progressContainer" style="display: none;">
@@ -157,12 +192,26 @@
                 <!-- Results Header -->
                 <div class="content-header">
                     <h2 class="content-title">Analysis Results</h2>
+                    <div class="header-actions">
+                    <button class="btn btn-ghost" id="revertBtn" style="display: none;" title="Restore the file as it was before the last applied fix">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>
+                        </svg>
+                        <span>Revert last fix</span>
+                    </button>
+                    <button class="btn btn-ghost" id="commitBtn" style="display: none;" title="Commit applied fixes to a new git branch">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="9" r="3"/><path d="M6 9v6M18 12a6 6 0 0 1-6 6H9"/>
+                        </svg>
+                        <span>Commit fixes to branch</span>
+                    </button>
                     <button class="btn btn-ghost" id="exportBtn" style="display: none;">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
                         </svg>
                         <span>Export Report</span>
                     </button>
+                    </div>
                 </div>
 
                 <!-- Welcome Screen with Animated Wolf -->
@@ -239,6 +288,67 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal" style="display: none;">
+        <div class="modal-card" role="dialog" aria-labelledby="settingsTitle">
+            <div class="modal-header">
+                <h2 id="settingsTitle">Settings</h2>
+                <button class="btn-icon" id="settingsCloseBtn" title="Close">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="apiKeyInput">Groq API key</label>
+                    <input type="password" id="apiKeyInput" class="form-input" placeholder="gsk_..." autocomplete="off" spellcheck="false">
+                    <div class="form-hint" id="apiKeyHint">Get a key at console.groq.com. Stored only on this computer.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="modelInput">Model</label>
+                    <div class="input-row">
+                        <input type="text" id="modelInput" class="form-input" list="modelOptions" spellcheck="false">
+                        <button class="btn btn-secondary" id="refreshModelsBtn" title="Load the models available to your key">Refresh</button>
+                    </div>
+                    <datalist id="modelOptions"></datalist>
+                </div>
+
+                <div class="form-group">
+                    <label for="temperatureInput">Temperature <span class="value-badge" id="temperatureValue">0.2</span></label>
+                    <input type="range" id="temperatureInput" min="0" max="1" step="0.05" class="form-range">
+                    <div class="form-hint">Lower values give more consistent, conservative fixes.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="concurrencyInput">Files analyzed at once <span class="value-badge" id="concurrencyValue">3</span></label>
+                    <input type="range" id="concurrencyInput" min="1" max="5" step="1" class="form-range">
+                    <div class="form-hint">Rate-limited requests are retried automatically with backoff.</div>
+                </div>
+
+                <label class="toggle-row">
+                    <input type="checkbox" id="analyzeOnlyInput">
+                    <span>
+                        <strong>Analyze only, never write</strong>
+                        <small>Fixes are shown for review but can't be applied.</small>
+                    </span>
+                </label>
+
+                <label class="toggle-row">
+                    <input type="checkbox" id="skipUnchangedInput">
+                    <span>
+                        <strong>Skip unchanged files</strong>
+                        <small>Reuse the last result when a file's content hasn't changed.</small>
+                    </span>
+                </label>
+                <button class="btn-link" id="clearCacheBtn">Clear saved results</button>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="settingsCancelBtn">Cancel</button>
+                <button class="btn btn-primary" id="settingsSaveBtn">Save</button>
+            </div>
         </div>
     </div>
 

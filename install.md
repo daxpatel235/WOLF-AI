@@ -32,23 +32,29 @@ pip install pyinstaller
 Example:
 python main.py
 
+🔑 Add your API key
+Start the app and open Settings (⚙ in the title bar), then paste your Groq API key.
+Do NOT put the key in the project folder or in the build: it is stored in your user profile.
+
 🚀 5️⃣ Convert to Executable (.exe) Using PyInstaller
-Basic command:
-pyinstaller --onefile main.py
-If you want no console window (for GUI apps):
-pyinstaller --onefile --noconsole main.py
+The UI files in Web/ must be bundled with the app (Windows uses ; and macOS/Linux use : in --add-data):
+Windows:
+pyinstaller --onefile --noconsole --add-data "Web;Web" --name WolfAI main.py
+macOS / Linux:
+pyinstaller --onefile --noconsole --add-data "Web:Web" --name WolfAI main.py
+Never add wolf_key.json to --add-data: anyone with the .exe could extract the key.
 
 📁 6️⃣ Understanding Generated Folders
 After running PyInstaller, you will see:
 build/
 dist/
-main.spec
+WolfAI.spec
 
 📂 dist/ Folder (Important)
 This is the final output folder.
 Inside it:
 dist/
- └── main.exe
+ └── WolfAI.exe
 
  👉 This .exe file is your standalone application.
 You can share this file with others — they do NOT need Python installed.

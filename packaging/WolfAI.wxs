@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Wolf AI installer (WiX v5).
+  Built by scripts\build.ps1:
+    wix build packaging\WolfAI.wxs -arch x64 -d Version=2.0.0 -bindpath app=dist\WolfAI -o dist\WolfAI-2.0.0-x64.msi
+
+  Keep UpgradeCode the same in every release: it lets a new version replace the old one.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Wolf AI Code Debugger"
+           Manufacturer="Dax Patel"
+           Version="$(var.Version)"
+           UpgradeCode="7B1E5C2A-9F44-4C3B-8E61-2D0A6F3B9C17"
+           Scope="perMachine">
+
+    <SummaryInformation Description="Wolf AI Code Debugger $(var.Version) installer" />
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/daxpatel235/WOLF-AI" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/daxpatel235/WOLF-AI/issues" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Wolf AI" />
+    </StandardDirectory>
+
+    <!-- Everything PyInstaller produced in dist\WolfAI, including subfolders. -->
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="!(bindpath.app)\**" />
+    </ComponentGroup>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Component Id="StartMenuShortcut">
+        <Shortcut Id="StartMenuShortcut"
+                  Name="Wolf AI"
+                  Description="AI-powered code debugger"
+                  Target="[INSTALLFOLDER]WolfAI.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\Dax Patel\Wolf AI"
+                       Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopShortcut">
+        <Shortcut Id="DesktopShortcut"
+                  Name="Wolf AI"
+                  Description="AI-powered code debugger"
+                  Target="[INSTALLFOLDER]WolfAI.exe"
+                  WorkingDirectory="INSTALLFOLDER" />
+        <RegistryValue Root="HKCU" Key="Software\Dax Patel\Wolf AI"
+                       Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="Wolf AI" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+  </Package>
+</Wix>

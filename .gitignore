@@ -4,3 +4,8 @@ dist/
 *.spec
 __pycache__/
 *.pyc
+
+# API keys: never commit or bundle the real key
+wolf_key.json
+.pytest_cache/
+.ruff_cache/

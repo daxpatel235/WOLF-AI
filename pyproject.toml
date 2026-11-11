@@ -1,0 +1,14 @@
+# Tool settings only (the app is packaged with PyInstaller, see scripts/build.ps1).
+# The version lives in backend/version.py.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["venv", "build", "dist"]
+
+[tool.ruff.lint]
+# Pyflakes (undefined names, unused imports/variables) and syntax errors
+select = ["F", "E9"]

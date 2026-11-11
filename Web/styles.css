@@ -1216,3 +1216,510 @@ body {
         border-bottom: 1px solid var(--border-color);
     }
 }
+
+/* ========================================
+   SETTINGS, REVIEW, SNIPPETS, CHAT, GIT
+   ======================================== */
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Form inputs */
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.form-range {
+    width: 100%;
+    accent-color: var(--primary);
+}
+
+.form-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.value-badge {
+    float: right;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.toggle-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-top: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.toggle-row input {
+    margin-top: 3px;
+    accent-color: var(--primary);
+}
+
+.toggle-row strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toggle-row small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* What-to-check chips */
+.check-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.form-group .chip {
+    display: inline-flex;
+    position: relative;
+    margin: 0;
+    cursor: pointer;
+}
+
+.chip input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chip span {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: all 0.15s ease;
+}
+
+.chip input:checked + span {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--text-primary);
+}
+
+.chip input:focus-visible + span {
+    outline: 2px solid var(--primary);
+}
+
+.mode-note {
+    font-size: 12px;
+    color: var(--warning);
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 16px;
+}
+
+/* Git panel */
+.git-panel {
+    margin-top: 12px;
+}
+
+.git-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.git-badge {
+    background: rgba(240, 80, 50, 0.15);
+    color: #f05032;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-weight: 600;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 900;
+}
+
+.modal-card {
+    width: min(520px, calc(100vw - 32px));
+    max-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header,
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Result card additions */
+.result-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badge-muted {
+    background: var(--bg-tertiary);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.result-warnings {
+    font-size: 13px;
+    color: var(--warning);
+    background: rgba(245, 158, 11, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+}
+
+.error-category {
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-left: 6px;
+    text-transform: lowercase;
+}
+
+.error-item.clickable {
+    cursor: pointer;
+}
+
+.error-item.clickable:hover {
+    background: var(--bg-hover);
+}
+
+/* Code snippet + diff share the same monospace rows */
+.code-snippet,
+.diff-side {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow-x: auto;
+}
+
+.code-snippet {
+    margin-top: 10px;
+    cursor: text;
+    padding: 6px 0;
+}
+
+.snippet-row,
+.diff-row {
+    display: flex;
+    white-space: pre;
+    min-width: max-content;
+}
+
+.ln {
+    flex: 0 0 auto;
+    width: 44px;
+    padding-right: 10px;
+    text-align: right;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.code {
+    padding-right: 12px;
+    color: var(--text-secondary);
+}
+
+.snippet-row.hl {
+    background: rgba(239, 68, 68, 0.15);
+    box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.snippet-row.hl .code {
+    color: var(--text-primary);
+}
+
+.snippet-empty {
+    padding: 6px 12px;
+    color: var(--text-muted);
+}
+
+/* Fix review */
+.fix-section {
+    margin-top: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.fix-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    font-size: 13px;
+}
+
+.fix-bar em {
+    color: var(--warning);
+    font-style: normal;
+}
+
+.diff-view {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border-color);
+}
+
+.hunk {
+    margin-bottom: 14px;
+}
+
+.hunk-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.hunk-head input {
+    accent-color: var(--primary);
+}
+
+.hunk-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+}
+
+.diff-side-label {
+    position: sticky;
+    left: 0;
+    font-family: system-ui, sans-serif;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.diff-row.del {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.diff-row.add {
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.diff-row.del .code,
+.diff-row.add .code {
+    color: var(--text-primary);
+}
+
+.diff-row.pad {
+    background: repeating-linear-gradient(45deg, transparent 0 4px, rgba(255, 255, 255, 0.03) 4px 8px);
+}
+
+.fix-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.fix-note,
+.fix-done {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.fix-done {
+    color: var(--success);
+}
+
+/* Follow-up chat */
+.card-actions {
+    margin-top: 14px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chat-section {
+    margin-top: 12px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 360px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.chat-msg {
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 10px 12px;
+    border-radius: 10px;
+    max-width: 85%;
+    overflow-wrap: anywhere;
+}
+
+.chat-user {
+    align-self: flex-end;
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.chat-bot {
+    align-self: flex-start;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+.chat-pending {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.chat-msg code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    background: var(--bg-primary);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.chat-code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    margin: 6px 0;
+    overflow-x: auto;
+}
+
+.chat-form {
+    display: flex;
+    gap: 8px;
+}
